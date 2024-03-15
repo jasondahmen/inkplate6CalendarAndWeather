@@ -33,6 +33,7 @@ Calendar and Weather for my inkplate6
 # To Do
   - Look into wake button on for GPIO and setting up a script
   - Set display to partial update by default
+  - Battery and Wifi ICONS
 
 # Support Me
  - If I saved you some time consider supporting me: https://www.buymeacoffee.com/jasondahmen
