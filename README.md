@@ -12,7 +12,7 @@ Calendar and Weather for my inkplate6
       - I downloaded this:(https://dl.espressif.com/dl/idf-installer/esp-idf-tools-setup-online-2.24.exe) to push my first esphome via USB, after that all code was pushed wirelessly
     - I have a cert on my Home Assistant box so setup was easy, unfortunately I do not know the work around method for http. Please do this on your own.
   - Integrations
-    - CHANGE THE TEMPLATES YAML if you are using a different integration.
+    - ***CHANGE THE TEMPLATES YAML*** if you are using a different integration.
     - TEST with "Developer tools" -> "Services" -> weather.get_forecasts
     - TEST with "Developer tools" -> "Services" -> calendar.get_events
       
