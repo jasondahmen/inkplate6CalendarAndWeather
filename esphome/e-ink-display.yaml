@@ -1,0 +1,658 @@
+substitutions:
+  friendly_name: "E-Ink Display"
+
+esphome:
+  name: e-ink-display
+  on_boot:
+    then:
+      - script.execute: update_screen
+
+esp32:
+  board: esp-wrover-kit
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: OMMITED
+
+ota:
+  password: OMMITED
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: OMMITED
+    password: OMMITED
+
+sensor:
+  - platform: uptime
+    name: $friendly_name Uptime
+  - platform: wifi_signal
+    name: $friendly_name Wifi RSSI
+    update_interval: 60s
+
+button:
+  - platform: restart
+    name: $friendly_name Reboot
+  - platform: template
+    name: $friendly_name Refresh Screen
+    entity_category: config
+    on_press:
+      - script.execute: update_screen
+
+script:
+  - id: update_screen
+    then:
+      - component.update: inkplate_display
+
+time:
+  - platform: sntp
+    id: esptime
+    timezone: America/Chicago
+
+text_sensor:
+  - platform: homeassistant
+    id: f_day_1
+    entity_id: sensor.formatted_days
+    attribute: f_day_1
+  - platform: homeassistant
+    id: f_day_2
+    entity_id: sensor.formatted_days
+    attribute: f_day_2
+  - platform: homeassistant
+    id: f_day_3
+    entity_id: sensor.formatted_days
+    attribute: f_day_3
+#######################################################################
+  - platform: homeassistant
+    id: h_1_temp
+    entity_id: sensor.weather_hours
+    attribute: h_1_temp
+  - platform: homeassistant
+    id: h_1_cond
+    entity_id: sensor.weather_hours
+    attribute: h_1_cond
+  - platform: homeassistant
+    id: h_1_time
+    entity_id: sensor.weather_hours
+    attribute: h_1_time
+##############
+  - platform: homeassistant
+    id: h_2_temp
+    entity_id: sensor.weather_hours
+    attribute: h_2_temp
+  - platform: homeassistant
+    id: h_2_cond
+    entity_id: sensor.weather_hours
+    attribute: h_2_cond
+  - platform: homeassistant
+    id: h_2_time
+    entity_id: sensor.weather_hours
+    attribute: h_2_time
+##############
+  - platform: homeassistant
+    id: h_3_temp
+    entity_id: sensor.weather_hours
+    attribute: h_3_temp
+  - platform: homeassistant
+    id: h_3_cond
+    entity_id: sensor.weather_hours
+    attribute: h_3_cond
+  - platform: homeassistant
+    id: h_3_time
+    entity_id: sensor.weather_hours
+    attribute: h_3_time
+##############
+  - platform: homeassistant
+    id: h_4_temp
+    entity_id: sensor.weather_hours
+    attribute: h_4_temp
+  - platform: homeassistant
+    id: h_4_cond
+    entity_id: sensor.weather_hours
+    attribute: h_4_cond
+  - platform: homeassistant
+    id: h_4_time
+    entity_id: sensor.weather_hours
+    attribute: h_4_time
+##############
+  - platform: homeassistant
+    id: h_5_temp
+    entity_id: sensor.weather_hours
+    attribute: h_5_temp
+  - platform: homeassistant
+    id: h_5_cond
+    entity_id: sensor.weather_hours
+    attribute: h_5_cond
+  - platform: homeassistant
+    id: h_5_time
+    entity_id: sensor.weather_hours
+    attribute: h_5_time
+##############
+  - platform: homeassistant
+    id: h_6_temp
+    entity_id: sensor.weather_hours
+    attribute: h_6_temp
+  - platform: homeassistant
+    id: h_6_cond
+    entity_id: sensor.weather_hours
+    attribute: h_6_cond
+  - platform: homeassistant
+    id: h_6_time
+    entity_id: sensor.weather_hours
+    attribute: h_6_time
+##############
+  - platform: homeassistant
+    id: h_7_temp
+    entity_id: sensor.weather_hours
+    attribute: h_7_temp
+  - platform: homeassistant
+    id: h_7_cond
+    entity_id: sensor.weather_hours
+    attribute: h_7_cond
+  - platform: homeassistant
+    id: h_7_time
+    entity_id: sensor.weather_hours
+    attribute: h_7_time
+##############
+  - platform: homeassistant
+    id: h_8_temp
+    entity_id: sensor.weather_hours
+    attribute: h_8_temp
+  - platform: homeassistant
+    id: h_8_cond
+    entity_id: sensor.weather_hours
+    attribute: h_8_cond
+  - platform: homeassistant
+    id: h_8_time
+    entity_id: sensor.weather_hours
+    attribute: h_8_time
+#######################################################################
+  - platform: homeassistant
+    id: d_1_temp
+    entity_id: sensor.weather_days
+    attribute: d_1_temp
+  - platform: homeassistant
+    id: d_1_cond
+    entity_id: sensor.weather_days
+    attribute: d_1_cond
+##############
+  - platform: homeassistant
+    id: d_2_temp
+    entity_id: sensor.weather_days
+    attribute: d_2_temp
+  - platform: homeassistant
+    id: d_2_cond
+    entity_id: sensor.weather_days
+    attribute: d_2_cond
+##############
+  - platform: homeassistant
+    id: d_3_temp
+    entity_id: sensor.weather_days
+    attribute: d_3_temp
+  - platform: homeassistant
+    id: d_3_cond
+    entity_id: sensor.weather_days
+    attribute: d_3_cond
+#######################################################################
+  - platform: homeassistant
+    id: d_1_event_0_sum
+    entity_id: sensor.d_1_event_0_sum
+  - platform: homeassistant
+    id: d_1_event_0_srt
+    entity_id: sensor.d_1_event_0_srt
+  - platform: homeassistant
+    id: d_1_event_0_end
+    entity_id: sensor.d_1_event_0_end
+##############
+  - platform: homeassistant
+    id: d_1_event_1_sum
+    entity_id: sensor.d_1_event_1_sum
+  - platform: homeassistant
+    id: d_1_event_1_srt
+    entity_id: sensor.d_1_event_1_srt
+  - platform: homeassistant
+    id: d_1_event_1_end
+    entity_id: sensor.d_1_event_1_end
+##############
+  - platform: homeassistant
+    id: d_1_event_2_sum
+    entity_id: sensor.d_1_event_2_sum
+  - platform: homeassistant
+    id: d_1_event_2_srt
+    entity_id: sensor.d_1_event_2_srt
+  - platform: homeassistant
+    id: d_1_event_2_end
+    entity_id: sensor.d_1_event_2_end
+##############
+  - platform: homeassistant
+    id: d_1_event_3_sum
+    entity_id: sensor.d_1_event_3_sum
+  - platform: homeassistant
+    id: d_1_event_3_srt
+    entity_id: sensor.d_1_event_3_srt
+  - platform: homeassistant
+    id: d_1_event_3_end
+    entity_id: sensor.d_1_event_3_end
+##############
+  - platform: homeassistant
+    id: d_1_event_4_sum
+    entity_id: sensor.d_1_event_4_sum
+  - platform: homeassistant
+    id: d_1_event_4_srt
+    entity_id: sensor.d_1_event_4_srt
+  - platform: homeassistant
+    id: d_1_event_4_end
+    entity_id: sensor.d_1_event_4_end
+##############==============##############
+  - platform: homeassistant
+    id: d_2_event_0_sum
+    entity_id: sensor.d_2_event_0_sum
+  - platform: homeassistant
+    id: d_2_event_0_srt
+    entity_id: sensor.d_2_event_0_srt
+  - platform: homeassistant
+    id: d_2_event_0_end
+    entity_id: sensor.d_2_event_0_end
+##############
+  - platform: homeassistant
+    id: d_2_event_1_sum
+    entity_id: sensor.d_2_event_1_sum
+  - platform: homeassistant
+    id: d_2_event_1_srt
+    entity_id: sensor.d_2_event_1_srt
+  - platform: homeassistant
+    id: d_2_event_1_end
+    entity_id: sensor.d_2_event_1_end
+##############
+  - platform: homeassistant
+    id: d_2_event_2_sum
+    entity_id: sensor.d_2_event_2_sum
+  - platform: homeassistant
+    id: d_2_event_2_srt
+    entity_id: sensor.d_2_event_2_srt
+  - platform: homeassistant
+    id: d_2_event_2_end
+    entity_id: sensor.d_2_event_2_end
+##############
+  - platform: homeassistant
+    id: d_2_event_3_sum
+    entity_id: sensor.d_2_event_3_sum
+  - platform: homeassistant
+    id: d_2_event_3_srt
+    entity_id: sensor.d_2_event_3_srt
+  - platform: homeassistant
+    id: d_2_event_3_end
+    entity_id: sensor.d_2_event_3_end
+##############
+  - platform: homeassistant
+    id: d_2_event_4_sum
+    entity_id: sensor.d_2_event_4_sum
+  - platform: homeassistant
+    id: d_2_event_4_srt
+    entity_id: sensor.d_2_event_4_srt
+  - platform: homeassistant
+    id: d_2_event_4_end
+    entity_id: sensor.d_2_event_4_end
+##############==============##############
+  - platform: homeassistant
+    id: d_3_event_0_sum
+    entity_id: sensor.d_3_event_0_sum
+  - platform: homeassistant
+    id: d_3_event_0_srt
+    entity_id: sensor.d_3_event_0_srt
+  - platform: homeassistant
+    id: d_3_event_0_end
+    entity_id: sensor.d_3_event_0_end
+##############
+  - platform: homeassistant
+    id: d_3_event_1_sum
+    entity_id: sensor.d_3_event_1_sum
+  - platform: homeassistant
+    id: d_3_event_1_srt
+    entity_id: sensor.d_3_event_1_srt
+  - platform: homeassistant
+    id: d_3_event_1_end
+    entity_id: sensor.d_3_event_1_end
+##############
+  - platform: homeassistant
+    id: d_3_event_2_sum
+    entity_id: sensor.d_3_event_2_sum
+  - platform: homeassistant
+    id: d_3_event_2_srt
+    entity_id: sensor.d_3_event_2_srt
+  - platform: homeassistant
+    id: d_3_event_2_end
+    entity_id: sensor.d_3_event_2_end
+##############
+  - platform: homeassistant
+    id: d_3_event_3_sum
+    entity_id: sensor.d_3_event_3_sum
+  - platform: homeassistant
+    id: d_3_event_3_srt
+    entity_id: sensor.d_3_event_3_srt
+  - platform: homeassistant
+    id: d_3_event_3_end
+    entity_id: sensor.d_3_event_3_end
+##############
+  - platform: homeassistant
+    id: d_3_event_4_sum
+    entity_id: sensor.d_3_event_4_sum
+  - platform: homeassistant
+    id: d_3_event_4_srt
+    entity_id: sensor.d_3_event_4_srt
+  - platform: homeassistant
+    id: d_3_event_4_end
+    entity_id: sensor.d_3_event_4_end
+#######################################################################
+
+
+binary_sensor:
+  - platform: status
+    name: $friendly_name Status
+    id: system_status
+
+i2c:
+
+pca6416a:
+  - id: pca6416a_hub
+    address: 0x20
+
+switch:
+  - platform: template
+    name: "Inkplate Greyscale mode"
+    lambda: return id(inkplate_display).get_greyscale();
+    turn_on_action:
+      - lambda: id(inkplate_display).set_greyscale(true);
+    turn_off_action:
+      - lambda: id(inkplate_display).set_greyscale(false);
+
+  - platform: template
+    name: "Inkplate Partial Updating"
+    lambda: return id(inkplate_display).get_partial_updating();
+    turn_on_action:
+      - lambda: id(inkplate_display).set_partial_updating(true);
+    turn_off_action:
+      - lambda: id(inkplate_display).set_partial_updating(false);
+
+font:
+  - file: "Helvetica.ttf"
+    id: helvetica_96
+    size: 96
+  - file: "Helvetica.ttf"
+    id: helvetica_48
+    size: 48
+  - file: "Helvetica.ttf"
+    id: helvetica_24
+    size: 24
+  - file: "Helvetica.ttf"
+    id: helvetica_18
+    size: 18
+  - file: 'materialdesignicons-webfont.ttf'
+    id: font_mdi_large
+    size: 80
+    glyphs: &mdi-weather-glyphs
+      - "\U000F0590" # mdi-weather-cloudy
+      - "\U000F0F2F" # mdi-weather-cloudy-alert
+      - "\U000F0E6E" # mdi-weather-cloudy-arrow-right
+      - "\U000F0591" # mdi-weather-fog
+      - "\U000F0592" # mdi-weather-hail
+      - "\U000F0F30" # mdi-weather-hazy
+      - "\U000F0898" # mdi-weather-hurricane
+      - "\U000F0593" # mdi-weather-lightning
+      - "\U000F067E" # mdi-weather-lightning-rainy
+      - "\U000F0594" # mdi-weather-clear-night
+      - "\U000F0F31" # mdi-weather-night-partly-cloudy
+      - "\U000F0595" # mdi-weather-partly-cloudy
+      - "\U000F0F32" # mdi-weather-partly-lightning
+      - "\U000F0F33" # mdi-weather-partly-rainy
+      - "\U000F0F34" # mdi-weather-partly-snowy
+      - "\U000F0F35" # mdi-weather-partly-snowy-rainy
+      - "\U000F0596" # mdi-weather-pouring
+      - "\U000F0597" # mdi-weather-rainy
+      - "\U000F0598" # mdi-weather-snowy
+      - "\U000F0F36" # mdi-weather-snowy-heavy
+      - "\U000F067F" # mdi-weather-snowy-rainy
+      - "\U000F0599" # mdi-weather-sunny
+      - "\U000F0F37" # mdi-weather-sunny-alert
+      - "\U000F14E4" # mdi-weather-sunny-off
+      - "\U000F059A" # mdi-weather-sunset
+      - "\U000F059B" # mdi-weather-sunset-down
+      - "\U000F059C" # mdi-weather-sunset-up
+      - "\U000F0F38" # mdi-weather-tornado
+      - "\U000F059D" # mdi-weather-windy
+      - "\U000F059E" # mdi-weather-windy-variant
+      - "\U000F10AF" # mdi-door-closed-lock
+      - "\U000F081C" # mdi-door-open
+  - file: 'materialdesignicons-webfont.ttf'
+    id: font_mdi_medium
+    size: 40
+    glyphs: *mdi-weather-glyphs
+
+display:
+- platform: inkplate6
+  id: inkplate_display
+  greyscale: false
+  partial_updating: true
+  update_interval: 60s
+  full_update_every: 30
+  model: inkplate_6_v2
+
+  ckv_pin: 32
+  sph_pin: 33
+  gmod_pin:
+    pca6416a: pca6416a_hub
+    number: 1
+  gpio0_enable_pin:
+    pca6416a: pca6416a_hub
+    number: 8
+  oe_pin:
+    pca6416a: pca6416a_hub
+    number: 0
+  spv_pin:
+    pca6416a: pca6416a_hub
+    number: 2
+  powerup_pin:
+    pca6416a: pca6416a_hub
+    number: 4
+  wakeup_pin:
+    pca6416a: pca6416a_hub
+    number: 3
+  vcom_pin:
+    pca6416a: pca6416a_hub
+    number: 5
+
+  lambda: |-
+    // Screen Dimensions 0,0 is top left, 800,600 is bottom right
+    // it.line(0,0,800,600, COLOR_OFF);
+    // x=0, y=0, x=800, y=600
+    
+    // Turn the Full screen WHITE
+    it.fill(COLOR_ON);
+    //Thin RECTANGLE SCREEN
+    it.rectangle(0,0,800,600,COLOR_OFF);
+    //TOP HORIZONTAL
+    it.line(0,40,800,40,COLOR_OFF);
+    it.line(0,41,800,41,COLOR_OFF);
+    //VERTICAL DIVIDERS
+    it.line(266,42,266,500,COLOR_OFF);
+    it.line(267,42,267,500,COLOR_OFF);
+    it.line(533,42,533,500,COLOR_OFF);
+    it.line(534,42,534,500,COLOR_OFF);
+    //BOTTOM HORIZONTAL
+    it.line(0,500,800,500,COLOR_OFF);
+    it.line(0,501,800,501,COLOR_OFF);
+
+    // Map weather states to MDI characters.
+    std::map<std::string, std::string> weather_icon_map
+      {
+        {"cloudy", "\U000F0590"},
+        {"cloudy-alert", "\U000F0F2F"},
+        {"cloudy-arrow-right", "\U000F0E6E"},
+        {"fog", "\U000F0591"},
+        {"hail", "\U000F0592"},
+        {"hazy", "\U000F0F30"},
+        {"hurricane", "\U000F0898"},
+        {"lightning", "\U000F0593"},
+        {"lightning-rainy", "\U000F067E"},
+        {"clear-night", "\U000F0594"},
+        {"night-partly-cloudy", "U000F0F31"},
+        {"partlycloudy", "\U000F0595"},
+        {"partly-lightning", "\U000F0F32"},
+        {"partly-rainy", "\U000F0F33"},
+        {"partly-snowy", "\U000F0F34"},
+        {"partly-snowy-rainy", "\U000F0F35"},
+        {"pouring", "\U000F0596"},
+        {"rainy", "\U000F0597"},
+        {"snowy", "\U000F0598"},
+        {"snowy-heavy", "\U000F0F36"},
+        {"snowy-rainy", "\U000F067F"},
+        {"sunny", "\U000F0599"},
+        {"sunny-alert", "\U000F0F37"},
+        {"sunny-off", "\U000F14E4"},
+        {"sunset", "\U000F059A"},
+        {"sunset-down", "\U000F059B"},
+        {"sunset-up", "\U000F059C"},
+        {"tornado", "\U000F0F38"},
+        {"windy", "\U000F059D"},
+        {"windy-variant", "\U000F059E"},
+      };
+
+    //TOP STATUS BAR
+    it.strftime(10, 15, id(helvetica_18), COLOR_OFF, TextAlign::TOP_LEFT, "%a %b %d   %I:%M %p", id(esptime).now());
+    if (id(system_status).state) {
+      it.print(it.get_width() / 2, 15, id(helvetica_18), COLOR_OFF, TextAlign::TOP_CENTER, "Online");
+    } else {
+      it.print(it.get_width() / 2, 15, id(helvetica_18), COLOR_OFF, TextAlign::TOP_CENTER, "Offline");
+    }
+    it.print(((it.get_width() / 3) * 3) - 10, 15, id(helvetica_18), COLOR_OFF, TextAlign::TOP_RIGHT, "WIFI AND BATTERY");
+
+    
+    //First Rectangle
+    //1st Column Header
+    it.printf((it.get_width() / 6) * 1,65,id(helvetica_24),COLOR_OFF,TextAlign::CENTER,"%s",id(f_day_1).state.c_str());
+    it.printf((it.get_width() / 12) * 1,70,id(font_mdi_large), COLOR_OFF, TextAlign::CENTER_HORIZONTAL,"%s",weather_icon_map[id(d_1_cond).state.c_str()].c_str());
+    it.printf((it.get_width() / 12) * 3,100,id(helvetica_24), COLOR_OFF, TextAlign::CENTER, "%s°", id(d_1_temp).state.c_str());
+    it.printf((it.get_width() / 12) * 3,120,id(helvetica_18), COLOR_OFF, TextAlign::CENTER_HORIZONTAL,"%s",id(d_1_cond).state.c_str());
+
+    if (id(d_1_event_0_sum).state!="unavailable" && id(d_1_event_0_sum).state!="unknown") {
+      it.printf(10,155,id(helvetica_24), COLOR_OFF, TextAlign::LEFT,"%s",id(d_1_event_0_sum).state.c_str());
+      it.printf(((it.get_width() / 12) * 4) ,180,id(helvetica_18), COLOR_OFF, TextAlign::RIGHT,"%s-%s",id(d_1_event_0_srt).state.c_str(),id(d_1_event_0_end).state.c_str());
+    } else {}
+    if (id(d_1_event_1_sum).state!="unavailable" && id(d_1_event_1_sum).state!="unknown") {
+      it.printf(10,215,id(helvetica_24), COLOR_OFF, TextAlign::LEFT,"%s",id(d_1_event_1_sum).state.c_str());
+      it.printf(((it.get_width() / 12) * 4) ,240,id(helvetica_18), COLOR_OFF, TextAlign::RIGHT,"%s-%s",id(d_1_event_1_srt).state.c_str(),id(d_1_event_1_end).state.c_str());
+    } else {}
+    if (id(d_1_event_2_sum).state!="unavailable" && id(d_1_event_2_sum).state!="unknown") {
+      it.printf(10,275,id(helvetica_24), COLOR_OFF, TextAlign::LEFT,"%s",id(d_1_event_2_sum).state.c_str());
+      it.printf(((it.get_width() / 12) * 4) ,300,id(helvetica_18), COLOR_OFF, TextAlign::RIGHT,"%s-%s",id(d_1_event_2_srt).state.c_str(),id(d_1_event_2_end).state.c_str());
+    } else {}
+    if (id(d_1_event_3_sum).state!="unavailable" && id(d_1_event_3_sum).state!="unknown") {
+      it.printf(10,335,id(helvetica_24), COLOR_OFF, TextAlign::LEFT,"%s",id(d_1_event_3_sum).state.c_str());
+      it.printf(((it.get_width() / 12) * 4) ,360,id(helvetica_18), COLOR_OFF, TextAlign::RIGHT,"%s-%s",id(d_1_event_3_srt).state.c_str(),id(d_1_event_3_end).state.c_str());
+    } else {}
+    if (id(d_1_event_4_sum).state!="unavailable" && id(d_1_event_4_sum).state!="unknown") {
+      it.printf(10,395,id(helvetica_24), COLOR_OFF, TextAlign::LEFT,"%s",id(d_1_event_4_sum).state.c_str());
+      it.printf(((it.get_width() / 12) * 4) ,420,id(helvetica_18), COLOR_OFF, TextAlign::RIGHT,"%s-%s",id(d_1_event_4_srt).state.c_str(),id(d_1_event_4_end).state.c_str());
+    } else {}
+
+    ///////////////////////////////////////////////////////////////
+
+    // SECOND Rectangle
+    //2nd Column Header
+    it.printf((it.get_width() / 6) * 3,65,id(helvetica_24),COLOR_OFF,TextAlign::CENTER,"%s",id(f_day_2).state.c_str());
+    it.printf((it.get_width() / 12) * 5,70,id(font_mdi_large), COLOR_OFF, TextAlign::CENTER_HORIZONTAL,"%s",weather_icon_map[id(d_2_cond).state.c_str()].c_str());
+    it.printf((it.get_width() / 12) * 7,100,id(helvetica_24), COLOR_OFF, TextAlign::CENTER, "%s°", id(d_2_temp).state.c_str());
+    it.printf((it.get_width() / 12) * 7,120,id(helvetica_18), COLOR_OFF, TextAlign::CENTER_HORIZONTAL,"%s",id(d_2_cond).state.c_str());
+
+    if (id(d_2_event_0_sum).state!="unavailable" && id(d_2_event_0_sum).state!="unknown") {
+      it.printf(((it.get_width() / 12) * 4) + 10,155,id(helvetica_24), COLOR_OFF, TextAlign::LEFT,"%s",id(d_2_event_0_sum).state.c_str());
+      it.printf(((it.get_width() / 12) * 8) ,180,id(helvetica_18), COLOR_OFF, TextAlign::RIGHT,"%s-%s",id(d_2_event_0_srt).state.c_str(),id(d_2_event_0_end).state.c_str());
+    } else {}
+    if (id(d_2_event_1_sum).state!="unavailable" && id(d_2_event_1_sum).state!="unknown") {
+      it.printf(((it.get_width() / 12) * 4) + 10,215,id(helvetica_24), COLOR_OFF, TextAlign::LEFT,"%s",id(d_2_event_1_sum).state.c_str());
+      it.printf(((it.get_width() / 12) * 8) ,240,id(helvetica_18), COLOR_OFF, TextAlign::RIGHT,"%s-%s",id(d_2_event_1_srt).state.c_str(),id(d_2_event_1_end).state.c_str());
+    } else {}
+    if (id(d_2_event_2_sum).state!="unavailable" && id(d_2_event_2_sum).state!="unknown") {
+      it.printf(((it.get_width() / 12) * 4) + 10,275,id(helvetica_24), COLOR_OFF, TextAlign::LEFT,"%s",id(d_2_event_2_sum).state.c_str());
+      it.printf(((it.get_width() / 12) * 8) ,300,id(helvetica_18), COLOR_OFF, TextAlign::RIGHT,"%s-%s",id(d_2_event_2_srt).state.c_str(),id(d_2_event_2_end).state.c_str());
+    } else {}
+    if (id(d_2_event_3_sum).state!="unavailable" && id(d_2_event_3_sum).state!="unknown") {
+      it.printf(((it.get_width() / 12) * 4) + 10,335,id(helvetica_24), COLOR_OFF, TextAlign::LEFT,"%s",id(d_2_event_3_sum).state.c_str());
+      it.printf(((it.get_width() / 12) * 8) ,360,id(helvetica_18), COLOR_OFF, TextAlign::RIGHT,"%s-%s",id(d_2_event_3_srt).state.c_str(),id(d_2_event_3_end).state.c_str());
+    } else {}
+    if (id(d_2_event_4_sum).state!="unavailable" && id(d_2_event_4_sum).state!="unknown") {
+      it.printf(((it.get_width() / 12) * 4) + 10,395,id(helvetica_24), COLOR_OFF, TextAlign::LEFT,"%s",id(d_2_event_4_sum).state.c_str());
+      it.printf(((it.get_width() / 12) * 8) ,420,id(helvetica_18), COLOR_OFF, TextAlign::RIGHT,"%s-%s",id(d_2_event_4_srt).state.c_str(),id(d_2_event_4_end).state.c_str());
+    } else {}
+
+    ///////////////////////////////////////////////////////////////
+
+    // THIRD Rectangle
+    it.printf((it.get_width() / 6) * 5,65,id(helvetica_24),COLOR_OFF,TextAlign::CENTER,"%s",id(f_day_3).state.c_str());
+    it.printf((it.get_width() / 12) * 9,70,id(font_mdi_large), COLOR_OFF, TextAlign::CENTER_HORIZONTAL,"%s",weather_icon_map[id(d_3_cond).state.c_str()].c_str());
+    it.printf((it.get_width() / 12) * 11,100,id(helvetica_24), COLOR_OFF, TextAlign::CENTER, "%s°", id(d_3_temp).state.c_str());
+    it.printf((it.get_width() / 12) * 11,120,id(helvetica_18), COLOR_OFF, TextAlign::CENTER_HORIZONTAL,"%s",id(d_3_cond).state.c_str());
+
+    if (id(d_3_event_0_sum).state!="unavailable" && id(d_3_event_0_sum).state!="unknown") {
+      it.printf(((it.get_width() / 12) * 8) + 10,155,id(helvetica_24), COLOR_OFF, TextAlign::LEFT,"%s",id(d_3_event_0_sum).state.c_str());
+      it.printf(((it.get_width() / 12) * 12) ,180,id(helvetica_18), COLOR_OFF, TextAlign::RIGHT,"%s-%s",id(d_3_event_0_srt).state.c_str(),id(d_3_event_0_end).state.c_str());
+    } else {}
+    if (id(d_3_event_1_sum).state!="unavailable" && id(d_3_event_1_sum).state!="unknown") {
+      it.printf(((it.get_width() / 12) * 8) + 10,215,id(helvetica_24), COLOR_OFF, TextAlign::LEFT,"%s",id(d_3_event_1_sum).state.c_str());
+      it.printf(((it.get_width() / 12) * 12) ,240,id(helvetica_18), COLOR_OFF, TextAlign::RIGHT,"%s-%s",id(d_3_event_1_srt).state.c_str(),id(d_3_event_1_end).state.c_str());
+    } else {}
+    if (id(d_3_event_2_sum).state!="unavailable" && id(d_3_event_2_sum).state!="unknown") {
+      it.printf(((it.get_width() / 12) * 8) + 10,275,id(helvetica_24), COLOR_OFF, TextAlign::LEFT,"%s",id(d_3_event_2_sum).state.c_str());
+      it.printf(((it.get_width() / 12) * 12) ,300,id(helvetica_18), COLOR_OFF, TextAlign::RIGHT,"%s-%s",id(d_3_event_2_srt).state.c_str(),id(d_3_event_2_end).state.c_str());
+    } else {}
+    if (id(d_3_event_3_sum).state!="unavailable" && id(d_3_event_3_sum).state!="unknown") {
+      it.printf(((it.get_width() / 12) * 8) + 10,335,id(helvetica_24), COLOR_OFF, TextAlign::LEFT,"%s",id(d_3_event_3_sum).state.c_str());
+      it.printf(((it.get_width() / 12) * 12) ,360,id(helvetica_18), COLOR_OFF, TextAlign::RIGHT,"%s-%s",id(d_3_event_3_srt).state.c_str(),id(d_3_event_3_end).state.c_str());
+    } else {}
+    if (id(d_3_event_4_sum).state!="unavailable" && id(d_3_event_4_sum).state!="unknown") {
+      it.printf(((it.get_width() / 12) * 8) + 10,395,id(helvetica_24), COLOR_OFF, TextAlign::LEFT,"%s",id(d_3_event_4_sum).state.c_str());
+      it.printf(((it.get_width() / 12) * 12) ,420,id(helvetica_18), COLOR_OFF, TextAlign::RIGHT,"%s-%s",id(d_3_event_4_srt).state.c_str(),id(d_3_event_4_end).state.c_str());
+    } else {}
+
+
+    ///////////////////////////////////////////////////////////////
+
+    //BOTTOM STATUS BAR
+    it.printf((it.get_width() / 16) * 1,520,id(helvetica_18), COLOR_OFF, TextAlign::CENTER, "%s°", id(h_1_temp).state.c_str());
+    it.printf((it.get_width() / 16) * 1,550,id(font_mdi_medium), COLOR_OFF, TextAlign::CENTER,"%s",weather_icon_map[id(h_1_cond).state.c_str()].c_str());
+    it.printf((it.get_width() / 16) * 1,580,id(helvetica_18), COLOR_OFF, TextAlign::CENTER, "%s", id(h_1_time).state.c_str());
+
+    it.printf((it.get_width() / 16) * 3,520,id(helvetica_18), COLOR_OFF, TextAlign::CENTER, "%s°", id(h_2_temp).state.c_str());
+    it.printf((it.get_width() / 16) * 3,550,id(font_mdi_medium), COLOR_OFF, TextAlign::CENTER,"%s",weather_icon_map[id(h_2_cond).state.c_str()].c_str());
+    it.printf((it.get_width() / 16) * 3,580,id(helvetica_18), COLOR_OFF, TextAlign::CENTER, "%s", id(h_2_time).state.c_str());
+
+    it.printf((it.get_width() / 16) * 5,520,id(helvetica_18), COLOR_OFF, TextAlign::CENTER, "%s°", id(h_3_temp).state.c_str());
+    it.printf((it.get_width() / 16) * 5,550,id(font_mdi_medium), COLOR_OFF, TextAlign::CENTER,"%s",weather_icon_map[id(h_3_cond).state.c_str()].c_str());
+    it.printf((it.get_width() / 16) * 5,580,id(helvetica_18), COLOR_OFF, TextAlign::CENTER, "%s", id(h_3_time).state.c_str());
+
+    it.printf((it.get_width() / 16) * 7,520,id(helvetica_18), COLOR_OFF, TextAlign::CENTER, "%s°", id(h_4_temp).state.c_str());
+    it.printf((it.get_width() / 16) * 7,550,id(font_mdi_medium), COLOR_OFF, TextAlign::CENTER,"%s",weather_icon_map[id(h_4_cond).state.c_str()].c_str());
+    it.printf((it.get_width() / 16) * 7,580,id(helvetica_18), COLOR_OFF, TextAlign::CENTER, "%s", id(h_4_time).state.c_str());
+
+    it.printf((it.get_width() / 16) * 9,520,id(helvetica_18), COLOR_OFF, TextAlign::CENTER, "%s°", id(h_5_temp).state.c_str());
+    it.printf((it.get_width() / 16) * 9,550,id(font_mdi_medium), COLOR_OFF, TextAlign::CENTER,"%s",weather_icon_map[id(h_5_cond).state.c_str()].c_str());
+    it.printf((it.get_width() / 16) * 9,580,id(helvetica_18), COLOR_OFF, TextAlign::CENTER, "%s", id(h_5_time).state.c_str());
+
+    it.printf((it.get_width() / 16) * 11,520,id(helvetica_18), COLOR_OFF, TextAlign::CENTER, "%s°", id(h_6_temp).state.c_str());
+    it.printf((it.get_width() / 16) * 11,550,id(font_mdi_medium), COLOR_OFF, TextAlign::CENTER,"%s",weather_icon_map[id(h_6_cond).state.c_str()].c_str());
+    it.printf((it.get_width() / 16) * 11,580,id(helvetica_18), COLOR_OFF, TextAlign::CENTER, "%s", id(h_6_time).state.c_str());
+
+    it.printf((it.get_width() / 16) * 13,520,id(helvetica_18), COLOR_OFF, TextAlign::CENTER, "%s°", id(h_7_temp).state.c_str());
+    it.printf((it.get_width() / 16) * 13,550,id(font_mdi_medium), COLOR_OFF, TextAlign::CENTER,"%s",weather_icon_map[id(h_7_cond).state.c_str()].c_str());
+    it.printf((it.get_width() / 16) * 13,580,id(helvetica_18), COLOR_OFF, TextAlign::CENTER, "%s", id(h_7_time).state.c_str());
+
+    it.printf((it.get_width() / 16) * 15,520,id(helvetica_18), COLOR_OFF, TextAlign::CENTER, "%s°", id(h_8_temp).state.c_str());
+    it.printf((it.get_width() / 16) * 15,550,id(font_mdi_medium), COLOR_OFF, TextAlign::CENTER,"%s",weather_icon_map[id(h_8_cond).state.c_str()].c_str());
+    it.printf((it.get_width() / 16) * 15,580,id(helvetica_18), COLOR_OFF, TextAlign::CENTER, "%s", id(h_8_time).state.c_str());
