@@ -27,7 +27,7 @@ Calendar and Weather for my inkplate6
   - If you are using attributes in your template ALL "attribute_templates" must return values if not the calculation for them will not work.  Because of this all calendar entries needed to be individually added.
 
 # Support Me
- - If you would like to: https://www.buymeacoffee.com/jasondahmen
+ - If I saved you some time consider supporting me: https://www.buymeacoffee.com/jasondahmen
 
 # Citation and Inspiration
   - @jkmaxwell (https://github.com/jkmaxwell/Inkplate-ESPHome-Family-Calendar) For the Calendar code
