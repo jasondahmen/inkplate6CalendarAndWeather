@@ -21,7 +21,7 @@ Calendar and Weather for my inkplate6
     - Meteorologisk institutt (Met.no) DOUBLE CHECK name could be different
       - weather.home OR weather.forecast_home
     - Google Calendar
-      - calendar.ENTITY
+      - calendar.CALENDAR_ENTITY
   - Fonts
     - You will need download "Helvetica.ttf" and "materialdesignicons-webfont.tff" (case sensitivity matters for the code) and store them on with your ESPHome folder within Home Assistant
   - Knowledge
