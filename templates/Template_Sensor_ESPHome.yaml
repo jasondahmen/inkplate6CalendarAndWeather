@@ -1,0 +1,309 @@
+  - trigger:
+      - platform: event #update at startup#
+        event_type: homeassistant_started
+      - platform: time_pattern
+        minutes: /15 #every 15 minutes
+      - platform: state
+        entity_id:
+          - input_button.esphome #create a helper button and update this value
+    action:
+      - service: weather.get_forecasts #update daily forecasts#
+        target:
+          entity_id: weather.home
+        data:
+          type: daily
+        response_variable: daily
+      - service: calendar.get_events #calendar events day1
+        target:
+          entity_id: calendar.CALENDAR_ENTITY
+        data:
+          start_date_time: "{{as_timestamp(now()) | timestamp_custom('%Y-%m-%d %H:%M:%S')}}"
+          end_date_time: "{{ as_timestamp(now()) | timestamp_custom('%Y-%m-%d 23:59:59')}}"
+        response_variable: day1
+      - service: calendar.get_events #calendar events day2
+        target:
+          entity_id: calendar.CALENDAR_ENTITY
+        data:
+          start_date_time: "{{(as_timestamp(now()) + (24*3600)) | timestamp_custom('%Y-%m-%d 00:00:00')}}"
+          end_date_time: "{{(as_timestamp(now()) + (24*3600)) | timestamp_custom('%Y-%m-%d 23:59:59')}}"
+        response_variable: day2
+      - service: calendar.get_events #calendar events day3
+        target:
+          entity_id: calendar.CALENDAR_ENTITY
+        data:
+          start_date_time: "{{(as_timestamp(now()) + (48*3600)) | timestamp_custom('%Y-%m-%d 00:00:00')}}"
+          end_date_time: "{{(as_timestamp(now()) + (48*3600)) | timestamp_custom('%Y-%m-%d 23:59:59')}}"
+        response_variable: day3
+    sensors:
+#######################################################################
+      formatted_days:
+        value_template: >
+          {{ as_timestamp(now()) }}
+        attribute_templates:
+          f_day_1: >
+            {{ as_timestamp(now()) | timestamp_custom("%a %b %d") }}
+          f_day_2: >
+            {{ (as_timestamp(now()) + (24*3600)) | timestamp_custom("%a %b %d") }}
+          f_day_3: >
+            {{ (as_timestamp(now()) + (48*3600)) | timestamp_custom("%a %b %d") }}
+#######################################################################
+      weather_hours:
+        value_template: >
+          {{states('sensor.openweathermap_condition')}}
+        attribute_templates:
+          h_1_temp: >
+            {{ state_attr('weather.openweathermap', 'forecast')[0].temperature }}
+          h_1_cond: >
+            {{ state_attr('weather.openweathermap', 'forecast')[0].condition }}
+          h_1_time: >
+            {{ as_timestamp(as_local(as_datetime(state_attr('weather.openweathermap', 'forecast')[0].datetime))) | timestamp_custom('%I:%M%p') }}
+##############
+          h_2_temp: >
+            {{ state_attr('weather.openweathermap', 'forecast')[1].temperature }}
+          h_2_cond: >
+            {{ state_attr('weather.openweathermap', 'forecast')[1].condition }}
+          h_2_time: >
+            {{ as_timestamp(as_local(as_datetime(state_attr('weather.openweathermap', 'forecast')[1].datetime))) | timestamp_custom('%I:%M%p') }}
+##############
+          h_3_temp: >
+            {{ state_attr('weather.openweathermap', 'forecast')[2].temperature }}
+          h_3_cond: >
+            {{ state_attr('weather.openweathermap', 'forecast')[2].condition }}
+          h_3_time: >
+            {{ as_timestamp(as_local(as_datetime(state_attr('weather.openweathermap', 'forecast')[2].datetime))) | timestamp_custom('%I:%M%p') }}
+##############
+          h_4_temp: >
+            {{ state_attr('weather.openweathermap', 'forecast')[3].temperature }}
+          h_4_cond: >
+            {{ state_attr('weather.openweathermap', 'forecast')[3].condition }}
+          h_4_time: >
+            {{ as_timestamp(as_local(as_datetime(state_attr('weather.openweathermap', 'forecast')[3].datetime))) | timestamp_custom('%I:%M%p') }}
+##############
+          h_5_temp: >
+            {{ state_attr('weather.openweathermap', 'forecast')[4].temperature }}
+          h_5_cond: >
+            {{ state_attr('weather.openweathermap', 'forecast')[4].condition }}
+          h_5_time: >
+            {{ as_timestamp(as_local(as_datetime(state_attr('weather.openweathermap', 'forecast')[4].datetime))) | timestamp_custom('%I:%M%p') }}
+##############
+          h_6_temp: >
+            {{ state_attr('weather.openweathermap', 'forecast')[5].temperature }}
+          h_6_cond: >
+            {{ state_attr('weather.openweathermap', 'forecast')[5].condition }}
+          h_6_time: >
+            {{ as_timestamp(as_local(as_datetime(state_attr('weather.openweathermap', 'forecast')[5].datetime))) | timestamp_custom('%I:%M%p') }}
+##############
+          h_7_temp: >
+            {{ state_attr('weather.openweathermap', 'forecast')[6].temperature }}
+          h_7_cond: >
+            {{ state_attr('weather.openweathermap', 'forecast')[6].condition }}
+          h_7_time: >
+            {{ as_timestamp(as_local(as_datetime(state_attr('weather.openweathermap', 'forecast')[6].datetime))) | timestamp_custom('%I:%M%p') }}
+##############
+          h_8_temp: >
+            {{ state_attr('weather.openweathermap', 'forecast')[7].temperature }}
+          h_8_cond: >
+            {{ state_attr('weather.openweathermap', 'forecast')[7].condition }}
+          h_8_time: >
+            {{ as_timestamp(as_local(as_datetime(state_attr('weather.openweathermap', 'forecast')[7].datetime))) | timestamp_custom('%I:%M%p') }}
+#######################################################################
+      weather_days:
+        value_template: >
+          {{ states('weather.home') }}
+        attribute_templates:
+          d_1_temp: >
+            {{ daily['weather.home'].forecast[0].temperature }}
+          d_1_cond: >
+            {{ daily['weather.home'].forecast[0].condition }}
+##############
+          d_2_temp: >
+            {{ daily['weather.home'].forecast[1].temperature }}
+          d_2_cond: >
+            {{ daily['weather.home'].forecast[1].condition }}
+##############
+          d_3_temp: >
+            {{ daily['weather.home'].forecast[2].temperature }}
+          d_3_cond: >
+            {{ daily['weather.home'].forecast[2].condition }}
+#######################################################################
+    sensor:
+      - name: d_1_event_0_sum
+        unique_id: d_1_event_0_sum
+        state: "{{ day1['calendar.CALENDAR_ENTITY'].events[0].summary }}"
+      - name: d_1_event_0_srt
+        unique_id: d_1_event_0_srt
+        state: >
+          {{ as_timestamp(as_local(as_datetime(day1['calendar.CALENDAR_ENTITY'].events[0].start))) | timestamp_custom('%I:%M%p') }}
+      - name: d_1_event_0_end
+        unique_id: d_1_event_0_end
+        state: >
+          {{ as_timestamp(as_local(as_datetime(day1['calendar.CALENDAR_ENTITY'].events[0].end))) | timestamp_custom('%I:%M%p') }}
+##############
+      - name: d_1_event_1_sum
+        unique_id: d_1_event_1_sum
+        state: "{{ day1['calendar.CALENDAR_ENTITY'].events[1].summary }}"
+      - name: d_1_event_1_srt
+        unique_id: d_1_event_1_srt
+        state: >
+          {{ as_timestamp(as_local(as_datetime(day1['calendar.CALENDAR_ENTITY'].events[1].start))) | timestamp_custom('%I:%M%p') }}
+      - name: d_1_event_1_end
+        unique_id: d_1_event_1_end
+        state: >
+          {{ as_timestamp(as_local(as_datetime(day1['calendar.CALENDAR_ENTITY'].events[1].end))) | timestamp_custom('%I:%M%p') }}
+##############
+      - name: d_1_event_2_sum
+        unique_id: d_1_event_2_sum
+        state: "{{ day1['calendar.CALENDAR_ENTITY'].events[2].summary }}"
+      - name: d_1_event_2_srt
+        unique_id: d_1_event_2_srt
+        state: >
+          {{ as_timestamp(as_local(as_datetime(day1['calendar.CALENDAR_ENTITY'].events[2].start))) | timestamp_custom('%I:%M%p') }}
+      - name: d_1_event_2_end
+        unique_id: d_1_event_2_end
+        state: >
+          {{ as_timestamp(as_local(as_datetime(day1['calendar.CALENDAR_ENTITY'].events[2].end))) | timestamp_custom('%I:%M%p') }}
+##############
+      - name: d_1_event_3_sum
+        unique_id: d_1_event_3_sum
+        state: "{{ day1['calendar.CALENDAR_ENTITY'].events[3].summary }}"
+      - name: d_1_event_3_srt
+        unique_id: d_1_event_3_srt
+        state: >
+          {{ as_timestamp(as_local(as_datetime(day1['calendar.CALENDAR_ENTITY'].events[3].start))) | timestamp_custom('%I:%M%p') }}
+      - name: d_1_event_3_end
+        unique_id: d_1_event_3_end
+        state: >
+          {{ as_timestamp(as_local(as_datetime(day1['calendar.CALENDAR_ENTITY'].events[3].end))) | timestamp_custom('%I:%M%p') }}
+##############
+      - name: d_1_event_4_sum
+        unique_id: d_1_event_4_
+        state: "{{ day1['calendar.CALENDAR_ENTITY'].events[4].summary }}"
+      - name: d_1_event_4_srt
+        unique_id: d_1_event_4_srt
+        state: >
+          {{ as_timestamp(as_local(as_datetime(day1['calendar.CALENDAR_ENTITY'].events[4].start))) | timestamp_custom('%I:%M%p') }}
+      - name: d_1_event_4_end
+        unique_id: d_1_event_4_end
+        state: >
+          {{ as_timestamp(as_local(as_datetime(day1['calendar.CALENDAR_ENTITY'].events[4].end))) | timestamp_custom('%I:%M%p') }}
+#######################################################################
+      - name: d_2_event_0_sum
+        unique_id: d_2_event_0_sum
+        state: "{{ day2['calendar.CALENDAR_ENTITY'].events[0].summary }}"
+      - name: d_2_event_0_srt
+        unique_id: d_2_event_0_srt
+        state: >
+          {{ as_timestamp(as_local(as_datetime(day2['calendar.CALENDAR_ENTITY'].events[0].start))) | timestamp_custom('%I:%M%p') }}
+      - name: d_2_event_0_end
+        unique_id: d_2_event_0_end
+        state: >
+          {{ as_timestamp(as_local(as_datetime(day2['calendar.CALENDAR_ENTITY'].events[0].end))) | timestamp_custom('%I:%M%p') }}
+##############
+      - name: d_2_event_1_sum
+        unique_id: d_2_event_1_sum
+        state: "{{ day2['calendar.CALENDAR_ENTITY'].events[1].summary }}"
+      - name: d_2_event_1_srt
+        unique_id: d_2_event_1_srt
+        state: >
+          {{ as_timestamp(as_local(as_datetime(day2['calendar.CALENDAR_ENTITY'].events[1].start))) | timestamp_custom('%I:%M%p') }}
+      - name: d_2_event_1_end
+        unique_id: d_2_event_1_end
+        state: >
+          {{ as_timestamp(as_local(as_datetime(day2['calendar.CALENDAR_ENTITY'].events[1].end))) | timestamp_custom('%I:%M%p') }}
+##############
+      - name: d_2_event_2_sum
+        unique_id: d_2_event_2_sum
+        state: "{{ day2['calendar.CALENDAR_ENTITY'].events[2].summary }}"
+      - name: d_2_event_2_srt
+        unique_id: d_2_event_2_srt
+        state: >
+          {{ as_timestamp(as_local(as_datetime(day2['calendar.CALENDAR_ENTITY'].events[2].start))) | timestamp_custom('%I:%M%p') }}
+      - name: d_2_event_2_end
+        unique_id: d_2_event_2_end
+        state: >
+          {{ as_timestamp(as_local(as_datetime(day2['calendar.CALENDAR_ENTITY'].events[2].end))) | timestamp_custom('%I:%M%p') }}
+##############
+      - name: d_2_event_3_sum
+        unique_id: d_2_event_3_sum
+        state: "{{ day2['calendar.CALENDAR_ENTITY'].events[3].summary }}"
+      - name: d_2_event_3_srt
+        unique_id: d_2_event_3_srt
+        state: >
+          {{ as_timestamp(as_local(as_datetime(day2['calendar.CALENDAR_ENTITY'].events[3].start))) | timestamp_custom('%I:%M%p') }}
+      - name: d_2_event_3_end
+        unique_id: d_2_event_3_end
+        state: >
+          {{ as_timestamp(as_local(as_datetime(day2['calendar.CALENDAR_ENTITY'].events[3].end))) | timestamp_custom('%I:%M%p') }}
+##############
+      - name: d_2_event_4_sum
+        unique_id: d_2_event_4_
+        state: "{{ day2['calendar.CALENDAR_ENTITY'].events[4].summary }}"
+      - name: d_2_event_4_srt
+        unique_id: d_2_event_4_srt
+        state: >
+          {{ as_timestamp(as_local(as_datetime(day2['calendar.CALENDAR_ENTITY'].events[4].start))) | timestamp_custom('%I:%M%p') }}
+      - name: d_2_event_4_end
+        unique_id: d_2_event_4_end
+        state: >
+          {{ as_timestamp(as_local(as_datetime(day2['calendar.CALENDAR_ENTITY'].events[4].end))) | timestamp_custom('%I:%M%p') }}
+#######################################################################
+      - name: d_3_event_0_sum
+        unique_id: d_3_event_0_sum
+        state: "{{ day3['calendar.CALENDAR_ENTITY'].events[0].summary }}"
+      - name: d_3_event_0_srt
+        unique_id: d_3_event_0_srt
+        state: >
+          {{ as_timestamp(as_local(as_datetime(day3['calendar.CALENDAR_ENTITY'].events[0].start))) | timestamp_custom('%I:%M%p') }}
+      - name: d_3_event_0_end
+        unique_id: d_3_event_0_end
+        state: >
+          {{ as_timestamp(as_local(as_datetime(day3['calendar.CALENDAR_ENTITY'].events[0].end))) | timestamp_custom('%I:%M%p') }}
+##############
+      - name: d_3_event_1_sum
+        unique_id: d_3_event_1_sum
+        state: "{{ day3['calendar.CALENDAR_ENTITY'].events[1].summary }}"
+      - name: d_3_event_1_srt
+        unique_id: d_3_event_1_srt
+        state: >
+          {{ as_timestamp(as_local(as_datetime(day3['calendar.CALENDAR_ENTITY'].events[1].start))) | timestamp_custom('%I:%M%p') }}
+      - name: d_3_event_1_end
+        unique_id: d_3_event_1_end
+        state: >
+          {{ as_timestamp(as_local(as_datetime(day3['calendar.CALENDAR_ENTITY'].events[1].end))) | timestamp_custom('%I:%M%p') }}
+##############
+      - name: d_3_event_2_sum
+        unique_id: d_3_event_2_sum
+        state: "{{ day3['calendar.CALENDAR_ENTITY'].events[2].summary }}"
+      - name: d_3_event_2_srt
+        unique_id: d_3_event_2_srt
+        state: >
+          {{ as_timestamp(as_local(as_datetime(day3['calendar.CALENDAR_ENTITY'].events[2].start))) | timestamp_custom('%I:%M%p') }}
+      - name: d_3_event_2_end
+        unique_id: d_3_event_2_end
+        state: >
+          {{ as_timestamp(as_local(as_datetime(day3['calendar.CALENDAR_ENTITY'].events[2].end))) | timestamp_custom('%I:%M%p') }}
+##############
+      - name: d_3_event_3_sum
+        unique_id: d_3_event_3_sum
+        state: "{{ day3['calendar.CALENDAR_ENTITY'].events[3].summary }}"
+      - name: d_3_event_3_srt
+        unique_id: d_3_event_3_srt
+        state: >
+          {{ as_timestamp(as_local(as_datetime(day3['calendar.CALENDAR_ENTITY'].events[3].start))) | timestamp_custom('%I:%M%p') }}
+      - name: d_3_event_3_end
+        unique_id: d_3_event_3_end
+        state: >
+          {{ as_timestamp(as_local(as_datetime(day3['calendar.CALENDAR_ENTITY'].events[3].end))) | timestamp_custom('%I:%M%p') }}
+##############
+      - name: d_3_event_4_sum
+        unique_id: d_3_event_4_
+        state: "{{ day3['calendar.CALENDAR_ENTITY'].events[4].summary }}"
+      - name: d_3_event_4_srt
+        unique_id: d_3_event_4_srt
+        state: >
+          {{ as_timestamp(as_local(as_datetime(day3['calendar.CALENDAR_ENTITY'].events[4].start))) | timestamp_custom('%I:%M%p') }}
+      - name: d_3_event_4_end
+        unique_id: d_3_event_4_end
+        state: >
+          {{ as_timestamp(as_local(as_datetime(day3['calendar.CALENDAR_ENTITY'].events[4].end))) | timestamp_custom('%I:%M%p') }}
+#######################################################################
