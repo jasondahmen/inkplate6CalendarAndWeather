@@ -31,9 +31,25 @@ Calendar and Weather for my inkplate6
 # Notes
   - If you are using attributes in your template ALL "attribute_templates" must return values if not the calculation for them will not work.  Because of this all calendar entries needed to be individually added.
 # To Do
-  - Look into wake button on for GPIO and setting up a script
-  - Set display to partial update by default
-  - Battery and Wifi ICONS
+  - ~~Look into wake button on for GPIO and setting up a script~~
+  - ~~Set display to partial update by default~~
+  - ~~Battery and Wifi ICONS~~
+  - 3D print Case (make sure wake up button can be pressed, usb C can be inserted, integrate physical switch)
+# Changes
+  - added battery adc pin
+  - added wifi icon
+  - added battery icon # your voltages may vary, get the total runtime of your battery and calculate your voltages to a battery percent
+  - added deep sleep # comment out if you don’t want you device to deep sleep
+  - added deep sleep software and hardware switch # device needs to be out of deep sleep to see state change!
+    - hardware switch (not button) for deep sleep prevention # Keep in mind your device needs to be running to see either hardware or software switch state changes
+    - software switch (Controls) for deep sleep prevention # it is tied to the hardware pin but can be activated without it via home assistant
+  - changed wake up button from screen refresh to wake pin from deep sleep (this will also refresh the screen)
+  - changed display refresh time # New for deep sleep
+  - added screen clipping for events that might run into other columns
+  - removed online and offline status from top status bar
+  - removed partial updating
+  - removed greyscale
+  - changed order of sensor to help with coding
 
 # Support Me
  - If I saved you some time consider supporting me: https://www.buymeacoffee.com/jasondahmen
