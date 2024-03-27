@@ -30,32 +30,7 @@ wifi:
     ssid: OMMITED
     password: OMMITED
 
-sensor:
-  - platform: uptime
-    name: $friendly_name Uptime
-  - platform: wifi_signal
-    name: $friendly_name Wifi RSSI
-    update_interval: 60s
-
-button:
-  - platform: restart
-    name: $friendly_name Reboot
-  - platform: template
-    name: $friendly_name Refresh Screen
-    entity_category: config
-    on_press:
-      - script.execute: update_screen
-
-script:
-  - id: update_screen
-    then:
-      - component.update: inkplate_display
-
-time:
-  - platform: sntp
-    id: esptime
-    timezone: America/Chicago
-
+#######################################################################
 text_sensor:
   - platform: homeassistant
     id: f_day_1
@@ -352,11 +327,55 @@ text_sensor:
     entity_id: sensor.d_3_event_4_end
 #######################################################################
 
+sensor:
+  - platform: wifi_signal
+    id: rssi
+  - platform: adc
+    id: battery_voltage
+    update_interval: never
+    attenuation: 11db
+    pin: 35
+  - platform: template
+    name: "Inkplate Battery Voltage"
+    id: batt_volt_calc
+    accuracy_decimals: 3
+    state_class: "measurement"
+    lambda: |-
+      id(battery_read_mosfet).turn_on();
+      delay(1);
+      float adc = id(battery_voltage).sample();
+      id(battery_read_mosfet).turn_off();
+      return adc;
+    filters:
+      - multiply: 2
+##############
+
+button:
+  - platform: restart
+    name: $friendly_name Reboot
+  - platform: template
+    name: $friendly_name Refresh Screen
+    entity_category: config
+    on_press:
+      - script.execute: update_screen
 
 binary_sensor:
   - platform: status
     name: $friendly_name Status
     id: system_status
+  - platform: gpio
+    name: GPIO12
+    filters: 
+      - delayed_on_off: 10ms
+    pin:
+      number: 12
+      mode: 
+        input: True
+        pulldown: True
+    on_press: #Ties my GPIO input to a switch which is output only
+      - switch.turn_on: deep_sleep_switch
+    on_release: #Ties my GPIO input to a switch which is output only
+      - switch.turn_off: deep_sleep_switch
 
 i2c:
 
@@ -365,21 +384,60 @@ pca6416a:
     address: 0x20
 
 switch:
-  - platform: template
-    name: "Inkplate Greyscale mode"
-    lambda: return id(inkplate_display).get_greyscale();
-    turn_on_action:
-      - lambda: id(inkplate_display).set_greyscale(true);
-    turn_off_action:
-      - lambda: id(inkplate_display).set_greyscale(false);
-
-  - platform: template
-    name: "Inkplate Partial Updating"
-    lambda: return id(inkplate_display).get_partial_updating();
-    turn_on_action:
-      - lambda: id(inkplate_display).set_partial_updating(true);
-    turn_off_action:
+  - platform: gpio
+    id: battery_read_mosfet
+    pin:
+      pca6416a: pca6416a_hub
+      number: 9
+  - platform: gpio
+    id: deep_sleep_switch
+    name: Prevent Deep Sleep #Give me a software switch in HA if needed
+    pin: 
+      pca6416a: pca6416a_hub
+      number: 12
+    on_turn_on: 
+      then:
+        - deep_sleep.prevent: deep_sleep_1
+    on_turn_off: 
+      then:
+        - deep_sleep.allow: deep_sleep_1
+##############
+#  - platform: template
+#    name: "Inkplate Greyscale mode"
+#    lambda: return id(inkplate_display).get_greyscale();
+#    turn_on_action:
+#      - lambda: id(inkplate_display).set_greyscale(true);
+#    turn_off_action:
+#      - lambda: id(inkplate_display).set_greyscale(false);
+##############
+#  - platform: template
+#    name: "Inkplate Partial Updating"
+#    lambda: return id(inkplate_display).get_partial_updating();
+#    turn_on_action:
+#      - lambda: id(inkplate_display).set_partial_updating(true);
+#    turn_off_action:
+#      - lambda: id(inkplate_display).set_partial_updating(false);
+##############
+script:
+  - id: update_screen
+    then:
       - lambda: id(inkplate_display).set_partial_updating(false);
+      - component.update: inkplate_display
+      - lambda: id(inkplate_display).set_partial_updating(true);
+  
+deep_sleep:
+  id: deep_sleep_1
+  run_duration: 30s
+  sleep_duration: 270s
+  wakeup_pin: 
+    number: 36
+    inverted: True
+  
+
+time:
+  - platform: sntp
+    id: esptime
+    timezone: America/Chicago
 
 font:
   - file: "Helvetica.ttf"
@@ -428,20 +486,38 @@ font:
       - "\U000F0F38" # mdi-weather-tornado
       - "\U000F059D" # mdi-weather-windy
       - "\U000F059E" # mdi-weather-windy-variant
-      - "\U000F10AF" # mdi-door-closed-lock
-      - "\U000F081C" # mdi-door-open
+      - "\U000F10CD" # mdi-battery-alert-variant-outline # >3.00
+      - "\U000F007A" # mdi-battery-10 # 3.01 - 3.19
+      - "\U000F007B" # mdi-battery-20 # 3.20 - 3.21
+      - "\U000F007C" # mdi-battery-30 # 3.22 - 3.24
+      - "\U000F007D" # mdi-battery-40 # =3.25
+      - "\U000F007E" # mdi-battery-50 # =3.26
+      - "\U000F007F" # mdi-battery-60 # =3.27
+      - "\U000F0080" # mdi-battery-70 # 3.3 - 3.31
+      - "\U000F0081" # mdi-battery-80 # 3.32 - 3.34
+      - "\U000F0082" # mdi-battery-90 # 3.35 - 3.39
+      - "\U000F0079" # mdi-battery # <=3.4
+      - "\U000F0084" # mdi-battery-charging # <=4.2
+      - "\U000F091F" # mdi-wifi-strength-1 # RSSI > -75
+      - "\U000F0922" # mdi-wifi-strength-2 # RSSI -68 - -74
+      - "\U000F0925" # mdi-wifi-strength-3 # RSSI -61 - -67
+      - "\U000F0928" # mdi-wifi-strength-4 # RSSI < -60
   - file: 'materialdesignicons-webfont.ttf'
     id: font_mdi_medium
     size: 40
+    glyphs: *mdi-weather-glyphs
+  - file: 'materialdesignicons-webfont.ttf'
+    id: font_mdi_small
+    size: 30
     glyphs: *mdi-weather-glyphs
 
 display:
 - platform: inkplate6
   id: inkplate_display
   greyscale: false
-  partial_updating: true
-  update_interval: 60s
-  full_update_every: 30
+#  partial_updating: true
+  update_interval: 25s
+#  full_update_every: 6
   model: inkplate_6_v2
 
   ckv_pin: 32
@@ -524,23 +600,65 @@ display:
         {"windy-variant", "\U000F059E"},
       };
 
-    //TOP STATUS BAR
-    it.strftime(10, 15, id(helvetica_18), COLOR_OFF, TextAlign::TOP_LEFT, "%a %b %d   %I:%M %p", id(esptime).now());
-    if (id(system_status).state) {
-      it.print(it.get_width() / 2, 15, id(helvetica_18), COLOR_OFF, TextAlign::TOP_CENTER, "Online");
-    } else {
-      it.print(it.get_width() / 2, 15, id(helvetica_18), COLOR_OFF, TextAlign::TOP_CENTER, "Offline");
-    }
-    it.print(((it.get_width() / 3) * 3) - 10, 15, id(helvetica_18), COLOR_OFF, TextAlign::TOP_RIGHT, "WIFI AND BATTERY");
+    //it.printf(400, 550, id(helvetica_96), COLOR_OFF, TextAlign::CENTER, "%s", id(current_weather).state.c_str());
+    //it.print(((it.get_width() / 16) * 1), 550, id(helvetica_18), COLOR_OFF, TextAlign::CENTER, "WTHR 1");
+    //it.print(100, 100, id(helvetica_48), COLOR_OFF, TextAlign::TOP_LEFT, "ESPHome");
+    //it.strftime(400, 300, id(helvetica_48), COLOR_OFF, TextAlign::CENTER, "%Y-%m-%d", id(esptime).now());
+    //it.strftime(400, 400, id(helvetica_96), COLOR_OFF, TextAlign::CENTER, "%H:%M", id(esptime).now());
+    //it.printf((it.get_width() / 6) * 1, 550, id(helvetica_96), COLOR_OFF, TextAlign::CENTER, "%s", id(weather_d1).state.c_str());
+    //it.printf((it.get_width() / 6) * 1, 300, id(helvetica_24), COLOR_OFF, TextAlign::CENTER, "%s", id(ha_d1);
 
     
-    //First Rectangle
-    //1st Column Header
+
+    //TOP STATUS BAR
+    it.strftime(10, 15, id(helvetica_18), COLOR_OFF, TextAlign::TOP_LEFT, "Updated: %I:%M %p", id(esptime).now());
+    
+    // Wifi Signal Strength Chart
+    //it.printf(((it.get_width() / 3) * 3) - 155, 15, id(helvetica_18), COLOR_OFF, TextAlign::TOP_RIGHT, "%.0f", id(rssi).state);
+    if (id(rssi).state>-60) {
+      it.print(((it.get_width() / 3) * 3) - 37, 5, id(font_mdi_small), COLOR_OFF, TextAlign::TOP_RIGHT, "\U000F0928");
+    } else if (id(rssi).state<=-60 && id(rssi).state>=-67) {
+      it.print(((it.get_width() / 3) * 3) - 37, 5, id(font_mdi_small), COLOR_OFF, TextAlign::TOP_RIGHT, "\U000F0925");
+    } else if (id(rssi).state<=-68 && id(rssi).state>=-74) {
+      it.print(((it.get_width() / 3) * 3) - 37, 5, id(font_mdi_small), COLOR_OFF, TextAlign::TOP_RIGHT, "\U000F0922");
+    } else if (id(rssi).state<-74) {
+      it.print(((it.get_width() / 3) * 3) - 37, 5, id(font_mdi_small), COLOR_OFF, TextAlign::TOP_RIGHT, "\U000F091F");
+    } else {}
+
+    // Battery Voltage Chart
+    //it.printf(((it.get_width() / 3) * 3) - 90, 15, id(helvetica_18), COLOR_OFF, TextAlign::TOP_RIGHT, "%.3f", id(batt_volt_calc).state);
+    if (id(batt_volt_calc).state>4.11) {
+      it.printf(((it.get_width() / 3) * 3) - 3, 5, id(font_mdi_small), COLOR_OFF, TextAlign::TOP_RIGHT, "\U000F0079");
+    } else if (id(batt_volt_calc).state<=4.11 && id(batt_volt_calc).state>=4.01) {
+      it.printf(((it.get_width() / 3) * 3) - 3, 5, id(font_mdi_small), COLOR_OFF, TextAlign::TOP_RIGHT, "\U000F0082");
+    } else if (id(batt_volt_calc).state<=4 && id(batt_volt_calc).state>=3.92) {
+      it.printf(((it.get_width() / 3) * 3) - 3, 5, id(font_mdi_small), COLOR_OFF, TextAlign::TOP_RIGHT, "\U000F0081");
+    } else if (id(batt_volt_calc).state<=3.91 && id(batt_volt_calc).state>=3.81) {
+      it.printf(((it.get_width() / 3) * 3) - 3, 5, id(font_mdi_small), COLOR_OFF, TextAlign::TOP_RIGHT, "\U000F0080");
+    } else if (id(batt_volt_calc).state<=3.8 && id(batt_volt_calc).state>=3.72) {
+      it.printf(((it.get_width() / 3) * 3) - 3, 5, id(font_mdi_small), COLOR_OFF, TextAlign::TOP_RIGHT, "\U000F007F");
+    } else if (id(batt_volt_calc).state<=3.71 && id(batt_volt_calc).state>=3.68) {
+      it.printf(((it.get_width() / 3) * 3) - 3, 5, id(font_mdi_small), COLOR_OFF, TextAlign::TOP_RIGHT, "\U000F007E");
+    } else if (id(batt_volt_calc).state<=3.67 && id(batt_volt_calc).state>=3.64) {
+      it.printf(((it.get_width() / 3) * 3) - 3, 5, id(font_mdi_small), COLOR_OFF, TextAlign::TOP_RIGHT, "\U000F007D");
+    } else if (id(batt_volt_calc).state<=3.63 && id(batt_volt_calc).state>=3.57) {
+      it.printf(((it.get_width() / 3) * 3) - 3, 5, id(font_mdi_small), COLOR_OFF, TextAlign::TOP_RIGHT, "\U000F007C");
+    } else if (id(batt_volt_calc).state<=3.56 && id(batt_volt_calc).state>=3.47) {
+      it.printf(((it.get_width() / 3) * 3) - 3, 5, id(font_mdi_small), COLOR_OFF, TextAlign::TOP_RIGHT, "\U000F007B");
+    } else if (id(batt_volt_calc).state<=3.46 && id(batt_volt_calc).state>=3.38) {
+      it.printf(((it.get_width() / 3) * 3) - 3, 5, id(font_mdi_small), COLOR_OFF, TextAlign::TOP_RIGHT, "\U000F007A");
+    } else if (id(batt_volt_calc).state<3.38) {
+      it.printf(((it.get_width() / 3) * 3) - 3, 5, id(font_mdi_small), COLOR_OFF, TextAlign::TOP_RIGHT, "\U000F10CD");
+    } else {}
+    
+    // First Rectangle
+    // 1st Column Header
+    it.start_clipping(0,0,(it.get_width() / 3) * 1,600);
     it.printf((it.get_width() / 6) * 1,65,id(helvetica_24),COLOR_OFF,TextAlign::CENTER,"%s",id(f_day_1).state.c_str());
     it.printf((it.get_width() / 12) * 1,70,id(font_mdi_large), COLOR_OFF, TextAlign::CENTER_HORIZONTAL,"%s",weather_icon_map[id(d_1_cond).state.c_str()].c_str());
     it.printf((it.get_width() / 12) * 3,100,id(helvetica_24), COLOR_OFF, TextAlign::CENTER, "%s°", id(d_1_temp).state.c_str());
     it.printf((it.get_width() / 12) * 3,120,id(helvetica_18), COLOR_OFF, TextAlign::CENTER_HORIZONTAL,"%s",id(d_1_cond).state.c_str());
-
+    // 1st Column Events
     if (id(d_1_event_0_sum).state!="unavailable" && id(d_1_event_0_sum).state!="unknown") {
       it.printf(10,155,id(helvetica_24), COLOR_OFF, TextAlign::LEFT,"%s",id(d_1_event_0_sum).state.c_str());
       it.printf(((it.get_width() / 12) * 4) ,180,id(helvetica_18), COLOR_OFF, TextAlign::RIGHT,"%s-%s",id(d_1_event_0_srt).state.c_str(),id(d_1_event_0_end).state.c_str());
@@ -561,16 +679,18 @@ display:
       it.printf(10,395,id(helvetica_24), COLOR_OFF, TextAlign::LEFT,"%s",id(d_1_event_4_sum).state.c_str());
       it.printf(((it.get_width() / 12) * 4) ,420,id(helvetica_18), COLOR_OFF, TextAlign::RIGHT,"%s-%s",id(d_1_event_4_srt).state.c_str(),id(d_1_event_4_end).state.c_str());
     } else {}
+    it.end_clipping();
 
     ///////////////////////////////////////////////////////////////
 
     // SECOND Rectangle
-    //2nd Column Header
+    // 2nd Column Header
+    it.start_clipping((it.get_width() / 3) * 1,0,(it.get_width() / 3) * 2,600);
     it.printf((it.get_width() / 6) * 3,65,id(helvetica_24),COLOR_OFF,TextAlign::CENTER,"%s",id(f_day_2).state.c_str());
     it.printf((it.get_width() / 12) * 5,70,id(font_mdi_large), COLOR_OFF, TextAlign::CENTER_HORIZONTAL,"%s",weather_icon_map[id(d_2_cond).state.c_str()].c_str());
     it.printf((it.get_width() / 12) * 7,100,id(helvetica_24), COLOR_OFF, TextAlign::CENTER, "%s°", id(d_2_temp).state.c_str());
     it.printf((it.get_width() / 12) * 7,120,id(helvetica_18), COLOR_OFF, TextAlign::CENTER_HORIZONTAL,"%s",id(d_2_cond).state.c_str());
-
+    // 2nd Column Events
     if (id(d_2_event_0_sum).state!="unavailable" && id(d_2_event_0_sum).state!="unknown") {
       it.printf(((it.get_width() / 12) * 4) + 10,155,id(helvetica_24), COLOR_OFF, TextAlign::LEFT,"%s",id(d_2_event_0_sum).state.c_str());
       it.printf(((it.get_width() / 12) * 8) ,180,id(helvetica_18), COLOR_OFF, TextAlign::RIGHT,"%s-%s",id(d_2_event_0_srt).state.c_str(),id(d_2_event_0_end).state.c_str());
@@ -591,15 +711,18 @@ display:
       it.printf(((it.get_width() / 12) * 4) + 10,395,id(helvetica_24), COLOR_OFF, TextAlign::LEFT,"%s",id(d_2_event_4_sum).state.c_str());
       it.printf(((it.get_width() / 12) * 8) ,420,id(helvetica_18), COLOR_OFF, TextAlign::RIGHT,"%s-%s",id(d_2_event_4_srt).state.c_str(),id(d_2_event_4_end).state.c_str());
     } else {}
+    it.end_clipping();
 
     ///////////////////////////////////////////////////////////////
 
     // THIRD Rectangle
+    // 3rd Column Header
+    it.start_clipping((it.get_width() / 3) * 2,0,(it.get_width() / 3) * 3,600);
     it.printf((it.get_width() / 6) * 5,65,id(helvetica_24),COLOR_OFF,TextAlign::CENTER,"%s",id(f_day_3).state.c_str());
     it.printf((it.get_width() / 12) * 9,70,id(font_mdi_large), COLOR_OFF, TextAlign::CENTER_HORIZONTAL,"%s",weather_icon_map[id(d_3_cond).state.c_str()].c_str());
     it.printf((it.get_width() / 12) * 11,100,id(helvetica_24), COLOR_OFF, TextAlign::CENTER, "%s°", id(d_3_temp).state.c_str());
     it.printf((it.get_width() / 12) * 11,120,id(helvetica_18), COLOR_OFF, TextAlign::CENTER_HORIZONTAL,"%s",id(d_3_cond).state.c_str());
-
+    // 3rd Column Events
     if (id(d_3_event_0_sum).state!="unavailable" && id(d_3_event_0_sum).state!="unknown") {
       it.printf(((it.get_width() / 12) * 8) + 10,155,id(helvetica_24), COLOR_OFF, TextAlign::LEFT,"%s",id(d_3_event_0_sum).state.c_str());
       it.printf(((it.get_width() / 12) * 12) ,180,id(helvetica_18), COLOR_OFF, TextAlign::RIGHT,"%s-%s",id(d_3_event_0_srt).state.c_str(),id(d_3_event_0_end).state.c_str());
@@ -620,7 +743,7 @@ display:
       it.printf(((it.get_width() / 12) * 8) + 10,395,id(helvetica_24), COLOR_OFF, TextAlign::LEFT,"%s",id(d_3_event_4_sum).state.c_str());
       it.printf(((it.get_width() / 12) * 12) ,420,id(helvetica_18), COLOR_OFF, TextAlign::RIGHT,"%s-%s",id(d_3_event_4_srt).state.c_str(),id(d_3_event_4_end).state.c_str());
     } else {}
-
+    it.end_clipping();
 
     ///////////////////////////////////////////////////////////////
 
