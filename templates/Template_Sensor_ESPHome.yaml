@@ -13,6 +13,12 @@
         data:
           type: daily
         response_variable: daily
+      - service: weather.get_forecasts #update hourly forecasts#
+        target:
+          entity_id: weather.openweathermap
+        data:
+          type: hourly
+        response_variable: hourly
       - service: calendar.get_events #calendar events day1
         target:
           entity_id: calendar.CALENDAR_ENTITY
@@ -49,63 +55,63 @@
 #######################################################################
       weather_hours:
         value_template: >
-          {{states('sensor.openweathermap_condition')}}
+          {{ states('weather.openweathermap') }}
         attribute_templates:
           h_1_temp: >
-            {{ state_attr('weather.openweathermap', 'forecast')[0].temperature }}
+            {{ hourly['weather.openweathermap'].forecast[0].temperature }}
           h_1_cond: >
-            {{ state_attr('weather.openweathermap', 'forecast')[0].condition }}
+            {{ hourly['weather.openweathermap'].forecast[0].condition }}
           h_1_time: >
-            {{ as_timestamp(as_local(as_datetime(state_attr('weather.openweathermap', 'forecast')[0].datetime))) | timestamp_custom('%I:%M%p') }}
+            {{ as_timestamp(as_local(as_datetime(hourly['weather.openweathermap'].forecast[0].datetime))) | timestamp_custom('%I:%M%p') }}
 ##############
           h_2_temp: >
-            {{ state_attr('weather.openweathermap', 'forecast')[1].temperature }}
+            {{ hourly['weather.openweathermap'].forecast[1].temperature }}
           h_2_cond: >
-            {{ state_attr('weather.openweathermap', 'forecast')[1].condition }}
+            {{ hourly['weather.openweathermap'].forecast[1].condition }}
           h_2_time: >
-            {{ as_timestamp(as_local(as_datetime(state_attr('weather.openweathermap', 'forecast')[1].datetime))) | timestamp_custom('%I:%M%p') }}
+            {{ as_timestamp(as_local(as_datetime(hourly['weather.openweathermap'].forecast[1].datetime))) | timestamp_custom('%I:%M%p') }}
 ##############
           h_3_temp: >
-            {{ state_attr('weather.openweathermap', 'forecast')[2].temperature }}
+            {{ hourly['weather.openweathermap'].forecast[2].temperature }}
           h_3_cond: >
-            {{ state_attr('weather.openweathermap', 'forecast')[2].condition }}
+            {{ hourly['weather.openweathermap'].forecast[2].condition }}
           h_3_time: >
-            {{ as_timestamp(as_local(as_datetime(state_attr('weather.openweathermap', 'forecast')[2].datetime))) | timestamp_custom('%I:%M%p') }}
+            {{ as_timestamp(as_local(as_datetime(hourly['weather.openweathermap'].forecast[2].datetime))) | timestamp_custom('%I:%M%p') }}
 ##############
           h_4_temp: >
-            {{ state_attr('weather.openweathermap', 'forecast')[3].temperature }}
+            {{ hourly['weather.openweathermap'].forecast[3].temperature }}
           h_4_cond: >
-            {{ state_attr('weather.openweathermap', 'forecast')[3].condition }}
+            {{ hourly['weather.openweathermap'].forecast[3].condition }}
           h_4_time: >
-            {{ as_timestamp(as_local(as_datetime(state_attr('weather.openweathermap', 'forecast')[3].datetime))) | timestamp_custom('%I:%M%p') }}
+            {{ as_timestamp(as_local(as_datetime(hourly['weather.openweathermap'].forecast[3].datetime))) | timestamp_custom('%I:%M%p') }}
 ##############
           h_5_temp: >
-            {{ state_attr('weather.openweathermap', 'forecast')[4].temperature }}
+            {{ hourly['weather.openweathermap'].forecast[4].temperature }}
           h_5_cond: >
-            {{ state_attr('weather.openweathermap', 'forecast')[4].condition }}
+            {{ hourly['weather.openweathermap'].forecast[4].condition }}
           h_5_time: >
-            {{ as_timestamp(as_local(as_datetime(state_attr('weather.openweathermap', 'forecast')[4].datetime))) | timestamp_custom('%I:%M%p') }}
+            {{ as_timestamp(as_local(as_datetime(hourly['weather.openweathermap'].forecast[4].datetime))) | timestamp_custom('%I:%M%p') }}
 ##############
           h_6_temp: >
-            {{ state_attr('weather.openweathermap', 'forecast')[5].temperature }}
+            {{ hourly['weather.openweathermap'].forecast[5].temperature }}
           h_6_cond: >
-            {{ state_attr('weather.openweathermap', 'forecast')[5].condition }}
+            {{ hourly['weather.openweathermap'].forecast[5].condition }}
           h_6_time: >
-            {{ as_timestamp(as_local(as_datetime(state_attr('weather.openweathermap', 'forecast')[5].datetime))) | timestamp_custom('%I:%M%p') }}
+            {{ as_timestamp(as_local(as_datetime(hourly['weather.openweathermap'].forecast[5].datetime))) | timestamp_custom('%I:%M%p') }}
 ##############
           h_7_temp: >
-            {{ state_attr('weather.openweathermap', 'forecast')[6].temperature }}
+            {{ hourly['weather.openweathermap'].forecast[6].temperature }}
           h_7_cond: >
-            {{ state_attr('weather.openweathermap', 'forecast')[6].condition }}
+            {{ hourly['weather.openweathermap'].forecast[6].condition }}
           h_7_time: >
-            {{ as_timestamp(as_local(as_datetime(state_attr('weather.openweathermap', 'forecast')[6].datetime))) | timestamp_custom('%I:%M%p') }}
+            {{ as_timestamp(as_local(as_datetime(hourly['weather.openweathermap'].forecast[6].datetime))) | timestamp_custom('%I:%M%p') }}
 ##############
           h_8_temp: >
-            {{ state_attr('weather.openweathermap', 'forecast')[7].temperature }}
+            {{ hourly['weather.openweathermap'].forecast[7].temperature }}
           h_8_cond: >
-            {{ state_attr('weather.openweathermap', 'forecast')[7].condition }}
+            {{ hourly['weather.openweathermap'].forecast[7].condition }}
           h_8_time: >
-            {{ as_timestamp(as_local(as_datetime(state_attr('weather.openweathermap', 'forecast')[7].datetime))) | timestamp_custom('%I:%M%p') }}
+            {{ as_timestamp(as_local(as_datetime(hourly['weather.openweathermap'].forecast[7].datetime))) | timestamp_custom('%I:%M%p') }}
 #######################################################################
       weather_days:
         value_template: >
