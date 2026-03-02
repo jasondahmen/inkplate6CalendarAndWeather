@@ -16,8 +16,8 @@ Calendar and Weather for my inkplate6
     - TEST with "Developer tools" -> "Services" -> weather.get_forecasts
     - TEST with "Developer tools" -> "Services" -> calendar.get_events
       
-    - OpenWeatherMap
-      - I have the "OpenWeatherMap" integration setup for "onecall_hourly"
+    - ~~OpenWeatherMap~~
+      - ~~I have the "OpenWeatherMap" integration setup for "onecall_hourly"~~
     - Meteorologisk institutt (Met.no) DOUBLE CHECK name could be different
       - weather.home OR weather.forecast_home
     - Google Calendar
